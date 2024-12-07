@@ -1,0 +1,141 @@
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
+
+class Transaction {
+    String id;
+    double amount;
+    String location;
+    String time;
+
+    Transaction(String id, double amount, String location, String time) {
+        this.id = id;
+        this.amount = amount;
+        this.location = location;
+        this.time = time;
+    }
+}
+
+public class FraudDetection extends JFrame implements ActionListener {
+    private List<Transaction> transactions;
+    private JTextField idField, amountField, locationField, timeField;
+    private JTextArea displayArea;
+
+    public FraudDetection() {
+        transactions = new ArrayList<>();
+        createGUI();
+    }
+
+    private void createGUI() {
+        setTitle("Fraud Detection System");
+        setSize(500, 400);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(null);
+
+        JLabel idLabel = new JLabel("Transaction ID:");
+        idLabel.setBounds(20, 20, 120, 30);
+        add(idLabel);
+
+        idField = new JTextField();
+        idField.setBounds(150, 20, 200, 30);
+        add(idField);
+
+        JLabel amountLabel = new JLabel("Amount:");
+        amountLabel.setBounds(20, 60, 120, 30);
+        add(amountLabel);
+
+        amountField = new JTextField();
+        amountField.setBounds(150, 60, 200, 30);
+        add(amountField);
+
+        JLabel locationLabel = new JLabel("Location:");
+        locationLabel.setBounds(20, 100, 120, 30);
+        add(locationLabel);
+
+        locationField = new JTextField();
+        locationField.setBounds(150, 100, 200, 30);
+        add(locationField);
+
+        JLabel timeLabel = new JLabel("Time:");
+        timeLabel.setBounds(20, 140, 120, 30);
+        add(timeLabel);
+
+        timeField = new JTextField();
+        timeField.setBounds(150, 140, 200, 30);
+        add(timeField);
+
+        JButton addButton = new JButton("Add Transaction");
+        addButton.setBounds(20, 180, 150, 30);
+        addButton.addActionListener(this);
+        add(addButton);
+
+        JButton exitButton = new JButton("Exit");
+        exitButton.setBounds(200, 180, 150, 30);
+        exitButton.addActionListener(this);
+        add(exitButton);
+
+        displayArea = new JTextArea();
+        displayArea.setBounds(20, 230, 450, 120);
+        displayArea.setEditable(false);
+        add(displayArea);
+    }
+
+    public static void main(String[] args) {
+        FraudDetection fd = new FraudDetection();
+        fd.setVisible(true);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        String command = e.getActionCommand();
+        if (command.equals("Add Transaction")) {
+            addTransaction();
+        } else if (command.equals("Exit")) {
+            System.exit(0);
+        }
+    }
+
+    private void addTransaction() {
+        try {
+            String id = idField.getText();
+            double amount = Double.parseDouble(amountField.getText());
+            String location = locationField.getText();
+            String time = timeField.getText();
+
+            Transaction transaction = new Transaction(id, amount, location, time);
+            transactions.add(transaction);
+            if (isFraudulent(transaction)) {
+                displayArea.setText("Warning: Fraudulent transaction detected!\n");
+            } else {
+                displayArea.setText("Transaction added successfully.\n");
+            }
+            displayTransactions();
+        } catch (NumberFormatException ex) {
+            displayArea.setText("Invalid input. Please enter valid details.");
+        }
+    }
+
+    private boolean isFraudulent(Transaction transaction) {
+        if (transaction.amount > 1000) {
+            return true;
+        }
+        if (transaction.location.equalsIgnoreCase("unknown")) {
+            return true;
+        }
+        // Add more rules as needed
+        return false;
+    }
+
+    private void displayTransactions() {
+        StringBuilder sb = new StringBuilder("Transaction History:\n");
+        for (Transaction transaction : transactions) {
+            sb.append("ID: ").append(transaction.id)
+              .append(", Amount: $").append(transaction.amount)
+              .append(", Location: ").append(transaction.location)
+              .append(", Time: ").append(transaction.time).append("\n");
+        }
+        displayArea.append(sb.toString());
+    }
+}
